@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<control xmlns:def="Definition"
+         xmlns="http://schemas.sitecore.net/Visual-Studio-Intellisense"
+         xmlns:MCT="http://sitecore.net/Media-Conversion-Tool">
+  <MediaConversionToolMainForm>
+    <FormDialog Icon="Applications/24x24/gears.png" Header="Migrate Media Items"
+      Text="Select media items that you want to convert.">
+      <Stylesheet Src="/sitecore modules/Media Conversion Tool/Controls/Styles/MediaTreeview.css"/>
+      <CodeBeside Type="Sitecore.Modules.MediaConversionTool.MainPage,MediaConversionTool"/>
+
+      <DataContext ID="DataContext" Root="{3D6658D8-A0BF-4E75-B3E2-D050FABCF4E1}"/>
+
+      <GridPanel Width="100%" Height="100%">
+
+        <Border Padding="0 0 8 0" GridPanel.Height="2em">
+          <GridPanel Width="100%" Columns="2">
+            <Radiogroup ID="TargetGroup" Header="Convert to:&#160;" Style="white-space: nowrap;" Width="100%" Padding="0 0 0 4" GridPanel.Width="100%">
+            </Radiogroup>
+          </GridPanel>
+        </Border>
+
+        <GridPanel Width="100%" Height="100%">
+          <Toolbar>
+            <Toolbutton ID="Databases" Icon="Business/16x16/data.png" IconSize="id16x16" Header="Master" Glyph="images/menudropdown_black9x8.png" Click="ShowDatabases" ToolTip="Select another database." Style="width:80px;"/>
+            <Toolbutton ID="Refresh"  Icon="Applications/16x16/refresh.png" Tooltip="Refresh the list" Header="Refresh" Click="OnRefreshClick"/>
+          </Toolbar>
+          <Scrollbox Width="100%" Height="100%" Background="white" Border="1px inset" Padding="0" GridPanel.Height="100%">
+            <MCT:MediaTreeview ID="Treeview" DataContext="DataContext" Root="true" DblClick="OnDoubleClick" Width="100%">
+              <TreeHeader>
+                <TreeHeaderItem Name="name" Header="Name" />
+                <TreeHeaderItem Name="sizeis_multilanguaged" Header="Is versioned"/>
+                <TreeHeaderItem Name="stored_as" Header="Stored" />
+                <TreeHeaderItem Name="size" Header="Size" width="100%"/>
+              </TreeHeader>
+            </MCT:MediaTreeview>
+          </Scrollbox>
+
+          <Space GridPanel.Height="4px"/>
+
+          <Border GridPanel.Height="4px">
+            <Toolbutton Style="float:right" Icon="Applications/24x24/delete2.png" Header="Remove" ToolTip="Removes entry from selection list" Click="Remove(&quot;&quot;)"/>
+            <Toolbutton Icon="Software/24x24/branch.png" Header="Add with Subitems" ToolTip="Adds item with subitems" Click="AddTree"/>
+            <Toolbutton Icon="Software/24x24/element.png" Header="Add Item" ToolTip="Add Item" Click="AddItem"/>
+          </Border>
+
+          <Space GridPanel.Height="4px"/>
+
+          <Scrollbox ID="ItemListBox" Width="100%" Height="150px" ContextMenu="ListContextMenu()">
+            <Listview ID="ItemList" Width="100%" View="Details">
+              <ListviewHeader>
+                <ListviewHeaderItem Header="Selected items:"/>
+              </ListviewHeader>
+            </Listview>
+          </Scrollbox>
+        </GridPanel>
+
+      </GridPanel>
+    </FormDialog>
+  </MediaConversionToolMainForm>
+</control>

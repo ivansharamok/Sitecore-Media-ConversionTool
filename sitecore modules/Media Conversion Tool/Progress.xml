@@ -1,0 +1,58 @@
+﻿<control xmlns:def="Definition" xmlns="http://schemas.sitecore.net/Visual-Studio-Intellisense">
+  <MediaConversionToolWorkingForm>
+    <FormPage ID="formPage">
+      <CodeBeside Type="Sitecore.Modules.MediaConversionTool.Progress,MediaConversionTool"/>
+      <GridPanel Width="100%" Style="background-color:#e9e9e9;"  Height="100%">
+          <GridPanel Columns="2" Width="100%" Background="white" Margin="0">
+
+            <ThemedImage Src="Applications/24x24/gears.png" Width="32" Height="32" Margin="4px 8px 4px 8px" GridPanel.VAlign="top"/>
+
+            <Border Padding="2px 16px 0px 0px" GridPanel.Width="100%" GridPanel.VAlign="top">
+              <Border Foreground="black" Padding="0px 0px 4px 0px" FontSize="9pt" FontBold="true" FontName="tahoma">
+                <Literal Text="Migrate Media Items"/>
+              </Border>
+              <Border Foreground="#333333">
+                <Literal Text="Converting"/>
+              </Border>
+            </Border>
+
+          </GridPanel>
+
+        <Border Background="#dbdbdb" GridPanel.ColSpan="2" GridPanel.Height="2px">
+          <Space/>
+        </Border>
+
+        <Border Style="background-color:#e9e9e9; " GridPanel.Height="100%">
+          <Border Align="center">
+            <ThemedImage Src="/sitecore/shell/Themes/Standard/Applications/48x48/gear.png" Height="48px"/>
+          </Border>
+          <Border ID="brdProgress" Align="center" Style="padding-top: 10px; height: 50px">
+          </Border>
+        </Border>
+
+        <Border Background="#dbdbdb">
+          <Space/>
+        </Border>
+
+
+        <Border Padding="4px 16px 0px 16px" GridPanel.Height="32px">
+
+          <Border Float="right" Padding="0px 0px 0px 8px" NoWrap="NoWrap" Height="34">
+            <Space Width="4px" />
+            <Button ID="BtnConvertMore"  Header="Convert more" Width="86px" Height="23px" Click="OnBackClick()" KeyCode="13" Disabled="true" />
+            <Space def:ID="CancelSpace" Width="4" />
+            <Button ID="BtnClose"  Header="Close" Width="86px" Height="23px" Click="OnExitClick()" KeyCode="27" Disabled="true" />
+          </Border>
+
+          <def:Placeholder name="Buttons"/>
+        </Border>
+     
+      </GridPanel>
+      <script language="javascript">
+        window.setTimeout("scForm.postRequest('', '', '', 'Progress:refresh');", 100);
+      </script>
+    </FormPage>
+  </MediaConversionToolWorkingForm>
+</control>
+
+
