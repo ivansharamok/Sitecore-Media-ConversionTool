@@ -70,6 +70,7 @@
     <Content Include="Progress.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\CleanBlobs.cs" />
     <Compile Include="Commands\OpenMediaConversionTool.cs" />
     <Compile Include="Controls\MediaTreeview.cs" />
     <Compile Include="Controls\ProgressBar.cs" />
