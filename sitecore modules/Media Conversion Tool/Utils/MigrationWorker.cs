@@ -1,26 +1,28 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
+using Sitecore.Collections;
 using Sitecore.Data;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 using Sitecore.Configuration;
 using Sitecore.Resources.Media;
 using Sitecore.Jobs;
+using Sitecore.StringExtensions;
 
 namespace Sitecore.Modules.MediaConversionTool
 {
-   using System.Linq;
-
    internal class MigrationWorker
    {
-      private readonly ItemReference[] dataToPrecess;
+      private readonly ItemReference[] dataToProcess;
       private readonly bool convertToBlob;
 
       private MigrationWorker(ItemReference[] elements, bool convertToBlob)
       {
          Assert.ArgumentNotNull(elements, "elements");
-         this.dataToPrecess = elements;
+         this.dataToProcess = elements;
          this.convertToBlob = convertToBlob;
       }
 
@@ -35,29 +37,97 @@ namespace Sitecore.Modules.MediaConversionTool
       {
          try
          {
-            KeyValuePair<Item, int>[] allItems = GetAllItems(this.dataToPrecess);
+            ProcessReferences(this.dataToProcess);
+         }
+         catch (Exception e)
+         {
+            Log.Error("Unexpected error", e, typeof(MigrationWorker));
+         }
+      }
 
-            int versionsCount = allItems.Sum(itemPair => itemPair.Value);
+      private void ProcessReferences(ItemReference[] itemReferences)
+      {
+         Context.Job.Status.Processed = 0;
 
-            Context.Job.Status.Total = versionsCount;
-            Context.Job.Status.Processed = 0;
+         foreach (var reference in itemReferences)
+         {
+            Database database = Factory.GetDatabase(reference.ItemUri.DatabaseName);
+            Item item = database.GetItem(reference.ItemUri.ItemID);
 
-            foreach (KeyValuePair<Item, int> pair in allItems)
+            ProcessEntries(GetItemEnumerator(item), reference.Recursive);
+         }
+      }
+
+      private IEnumerable<Item> GetItemEnumerator(Item item)
+      {
+         if (item != null)
+         {
+            yield return item;
+         }
+      }
+
+      private IEnumerable<Item> GetChildEnumerator(Item item)
+      {
+#if DEBUG
+Stopwatch timer = Stopwatch.StartNew();
+#endif
+         if (item != null)
+         {
+            foreach (Item child in item.Children)
             {
-               Item item = pair.Key;
+               yield return child;
+            }
+
+         }
+#if DEBUG
+timer.Stop();
+Log.Debug("GetChildEnumerator for item '{0}' took '{1:c}'".FormatWith(new object[] { item.Uri.ToString(), timer.Elapsed }), this);
+#endif
+      }
+
+      private void ProcessEntries(IEnumerable<Item>  items, bool recursive)
+      {
+         try
+         {
+            foreach (Item item in items)
+            {
+               int processedEntities = 0;
 
                Context.Job.Status.Messages.Add(string.Format("Current item is {0}", GetItemPath(item)));
 
                if (this.convertToBlob)
                {
-                  MediaStorageManager.ChangeToDatabase(item, false);
+#if DEBUG
+Stopwatch timer = Stopwatch.StartNew();
+#endif
+                  
+                  processedEntities = MediaStorageManager.ChangeToDatabase(item);
+
+#if DEBUG
+                  timer.Stop();
+                  Log.Debug("ChangeToDatabase for item '{0}' took '{1:c}'".FormatWith(new object[]{ item.Uri.ToString(), timer.Elapsed}), this);
+#endif
                }
                else
                {
-                  MediaStorageManager.ChangeToFileSystem(item, false);
+#if DEBUG
+Stopwatch timer = Stopwatch.StartNew();
+#endif
+
+                  processedEntities = MediaStorageManager.ChangeToFileSystem(item);
+
+#if DEBUG
+                  timer.Stop();
+                  Log.Debug("ChangeToFileSystem for item '{0}' took '{1:c}'".FormatWith(new object[] { item.Uri.ToString(), timer.Elapsed }), this);
+#endif
                }
 
-               Context.Job.Status.Processed += pair.Value;
+               Context.Job.Status.Processed += processedEntities;
+
+               if (recursive)
+               {
+                  ProcessEntries(GetChildEnumerator(item), true);
+               }
             }
          }
          catch (Exception e)
@@ -68,28 +138,6 @@ namespace Sitecore.Modules.MediaConversionTool
 
       #region Private methods
 
-      private static KeyValuePair<Item, int>[] GetAllItems(IEnumerable<ItemReference> references)
-      {
-         List<KeyValuePair<Item, int>> result = new List<KeyValuePair<Item, int>>();
-         foreach (ItemReference reference in references)
-         {
-            Database database = Factory.GetDatabase(reference.ItemUri.DatabaseName);
-            Item item = database.GetItem(reference.ItemUri.ItemID);
-
-            DoJob(item, reference.Recursive,
-               delegate(Item it)
-               {
-                  Item[] itemsWithMedia = Utils.GetAllVersionsWithMedia(it);
-                  if (itemsWithMedia != null && itemsWithMedia.Length > 0)
-                  {
-                     result.Add(new KeyValuePair<Item, int>(it, itemsWithMedia.Length));
-                  }
-               });
-         }
-
-         return result.ToArray();
-      }
-
       private static string GetItemPath(Item item)
       {
          if (item == null)
@@ -99,22 +147,6 @@ namespace Sitecore.Modules.MediaConversionTool
 
          MediaItem mediaItem = new MediaItem(item);
          return item.Database.Name + ": " + mediaItem.MediaPath;
-      }
-
-      private delegate void OperationForItem(Item item);
-
-      private static void DoJob(Item item, bool recursive, OperationForItem operation)
-      {
-         item.Reload();
-         operation(item);
-
-         if (recursive)
-         {
-            foreach (Item childItem in item.Children)
-            {
-               DoJob(childItem, true, operation);
-            }
-         }
       }
 
       #endregion Private methods

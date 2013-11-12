@@ -47,17 +47,17 @@ namespace Sitecore.Modules.MediaConversionTool
 
       private void UpdateProgress(Job job)
       {
-         int total = (int)job.Status.Total;
+         int total = (int)job.Status.Processed;
          int progress = 0;
-         if (total > 0)
-         {
-            progress = (int)((job.Status.Processed * 100L) / total);
-         }
+         //if (total > 0)
+         //{
+         //   progress = (int)((job.Status.Processed * 100L) / total);
+         //}
 
          string message;
          if (job.IsDone)
          {
-            progress = 100;
+           progress = 100;
            string part = (total == 1) ? " was" : "s were";
            message = string.Format("Convestion finished<br/>{0} version{1} processed", total, part);
          }
@@ -78,7 +78,7 @@ namespace Sitecore.Modules.MediaConversionTool
                }
 
                string pluralEnding = (total == 1) ? string.Empty : "s";
-               message += string.Format("{0} of {1} version{2}", job.Status.Processed, total, pluralEnding);
+               message += string.Format("processed {0} version{1}", job.Status.Processed, pluralEnding);
             }
          }
 

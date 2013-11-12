@@ -1,10 +1,12 @@
+using System.Collections.Generic;
+
 namespace Sitecore.Modules.MediaConversionTool
 {
    using System.Linq;
 
-   using Sitecore.Data.Fields;
-   using Sitecore.Data.Items;
-   using Sitecore.Resources.Media;
+   using Data.Fields;
+   using Data.Items;
+   using Resources.Media;
 
    internal sealed class Utils
    {
@@ -12,17 +14,19 @@ namespace Sitecore.Modules.MediaConversionTool
       {
       }
 
+      /// <summary>
+      /// Gets all versions of the item that has media content.
+      /// </summary>
+      /// <param name="item">The item</param>
+      /// <returns>Item[]</returns>
       public static Item[] GetAllVersionsWithMedia(Item item)
       {
-         if (item == null)
-            return null;
+         bool versionable = IsVersionable(item);
 
-         bool multilanguage = IsMultilanguagePicture(item);
-
-         if (!multilanguage && IsMediaItem(item))
+         if (!versionable && IsMediaItem(item))
             return new Item[] { item };
 
-         return item.Versions.GetVersions(multilanguage).Where(IsMediaItem).ToArray();
+         return item.Versions.GetVersions(versionable).Where(IsMediaItem).ToArray();
       }
 
       public static bool IsMediaItem(Item item)
@@ -30,15 +34,9 @@ namespace Sitecore.Modules.MediaConversionTool
          return MediaManager.HasMediaContent(item);
       }
 
-      public static bool IsMultilanguagePicture(Item item)
+      public static bool IsVersionable(Item item)
       {
-         Media media = MediaManager.GetMedia(item);
-         if (media == null || media.MediaData == null)
-         {
-            return false;
-         }
-
-         Field mediaField = item.Fields[media.MediaData.DataFieldName];
+         Field mediaField = item.Fields["blob"];
          if (mediaField == null)
          {
             return false;

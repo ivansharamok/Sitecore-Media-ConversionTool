@@ -84,7 +84,7 @@ namespace Sitecore.Modules.MediaConversionTool.Controls
                if (!Utils.IsMediaItem(item))
                   return string.Empty;
                else
-                  return Utils.IsMultilanguagePicture(item) ? "Versioned" : "Unversioned";
+                  return Utils.IsVersionable(item) ? "Versioned" : "Unversioned";
 
             case FieldStoredAs:
                return ValueOfColumnStoredAs(item);

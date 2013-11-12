@@ -1,11 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaConversionTool", "sitecore modules\Media Conversion Tool\MediaConversionTool.csproj", "{79DE5C5B-E43A-4202-B164-D88EB0421545}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sitecore.Modules.MediaConversionTool", "sitecore modules\Media Conversion Tool\Sitecore.Modules.MediaConversionTool.csproj", "{79DE5C5B-E43A-4202-B164-D88EB0421545}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
