@@ -1,18 +1,15 @@
-using System.Diagnostics;
-using System.Threading;
-using Sitecore.Extensions;
-using Sitecore.SecurityModel;
-
-namespace Sitecore.Resources.Media
+namespace Sitecore.Modules.MediaConversionTool
 {
    using System;
    using System.Collections.Generic;
+   using System.Diagnostics;
    using System.IO;
-   using Data.Fields;
-   using Data.Items;
-   using Diagnostics;
-   using IO;
-   using StringExtensions;
+   using Sitecore.Data.Items;
+   using Sitecore.Diagnostics;
+   using Sitecore.IO;
+   using Sitecore.Resources.Media;
+   using Sitecore.SecurityModel;
+   using Sitecore.StringExtensions;
 
    public enum MediaStorageType
    {

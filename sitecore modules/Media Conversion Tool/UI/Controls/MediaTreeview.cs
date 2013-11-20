@@ -7,13 +7,12 @@ using System.Collections.Generic;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 using Sitecore.Web.UI.HtmlControls;
-using Sitecore.Modules.MediaConversionTool;
-using Sitecore.Resources.Media;
-
 using LiteralControl = System.Web.UI.LiteralControl;
 
 namespace Sitecore.Modules.MediaConversionTool.Controls
 {
+   using Sitecore.Modules.MediaConversionTool.Utils;
+
    public class MediaTreeview: DataTreeview
    {
       private const string FieldSize = "size";
@@ -127,7 +126,7 @@ namespace Sitecore.Modules.MediaConversionTool.Controls
          Item[] versions = Utils.GetAllVersionsWithMedia(item);
          foreach (Item version in versions)
          {
-            if (MediaStorageManager.IsFileBased(version))
+            if (Utils.IsFileBased(version))
                storedInFiles++;
             else
                storedInDatabase++;

@@ -6,8 +6,10 @@ using Sitecore.Shell.Framework;
 using Sitecore.Modules.MediaConversionTool.Controls;
 using Sitecore.Jobs;
 
-namespace Sitecore.Modules.MediaConversionTool
+namespace Sitecore.Modules.MediaConversionTool.UI
 {
+   using Sitecore.Globalization;
+
    public class Progress: BaseForm
    {
       private const string RefreshProgressMessage = "Progress:refresh";
@@ -26,6 +28,7 @@ namespace Sitecore.Modules.MediaConversionTool
 
          if (job.IsDone)
          {
+            this.BtnClose.Header = Translate.Text("Close");
             this.BtnClose.Disabled = false;
             this.BtnConvertMore.Disabled = false;
          }
@@ -42,7 +45,19 @@ namespace Sitecore.Modules.MediaConversionTool
 
       protected void OnExitClick()
       {
-         Windows.Close();
+         var job = GetJob();
+         if (job != null && (job.Status.State == JobState.Running || job.Status.State == JobState.Queued))
+         {
+            var options = job.Options.CustomData as ConversionOptions;
+            if (options != null)
+            {
+               options.ForceStop = true;
+            }
+         }
+         else
+         {
+            Windows.Close();
+         }
       }
 
       private void UpdateProgress(Job job)
@@ -91,6 +106,11 @@ namespace Sitecore.Modules.MediaConversionTool
          {
             return Handle.Parse(Context.Request.QueryString["handle"]);
          }
+      }
+
+      private static Job GetJob()
+      {
+         return JobManager.GetJob(JobHandle);
       }
    }
 }

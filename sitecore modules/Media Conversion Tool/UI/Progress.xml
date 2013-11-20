@@ -1,7 +1,7 @@
 ﻿<control xmlns:def="Definition" xmlns="http://schemas.sitecore.net/Visual-Studio-Intellisense">
   <MediaConversionToolWorkingForm>
     <FormPage ID="formPage">
-      <CodeBeside Type="Sitecore.Modules.MediaConversionTool.Progress,Sitecore.Modules.MediaConversionTool"/>
+      <CodeBeside Type="Sitecore.Modules.MediaConversionTool.UI.Progress,Sitecore.Modules.MediaConversionTool"/>
       <GridPanel Width="100%" Style="background-color:#e9e9e9;"  Height="100%">
           <GridPanel Columns="2" Width="100%" Background="white" Margin="0">
 
@@ -41,7 +41,7 @@
             <Space Width="4px" />
             <Button ID="BtnConvertMore"  Header="Convert more" Width="86px" Height="23px" Click="OnBackClick()" KeyCode="13" Disabled="true" />
             <Space def:ID="CancelSpace" Width="4" />
-            <Button ID="BtnClose"  Header="Close" Width="86px" Height="23px" Click="OnExitClick()" KeyCode="27" Disabled="true" />
+            <Button ID="BtnClose"  Header="Stop" Width="86px" Height="23px" Click="OnExitClick()" KeyCode="27" />
           </Border>
 
           <def:Placeholder name="Buttons"/>

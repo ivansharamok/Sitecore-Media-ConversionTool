@@ -6,7 +6,7 @@
     <FormDialog Icon="Applications/24x24/gears.png" Header="Migrate Media Items"
       Text="Select media items that you want to convert.">
       <Stylesheet Src="/sitecore modules/Media Conversion Tool/Controls/Styles/MediaTreeview.css"/>
-      <CodeBeside Type="Sitecore.Modules.MediaConversionTool.MainPage,Sitecore.Modules.MediaConversionTool"/>
+      <CodeBeside Type="Sitecore.Modules.MediaConversionTool.UI.MainPage,Sitecore.Modules.MediaConversionTool"/>
 
       <DataContext ID="DataContext" Root="{3D6658D8-A0BF-4E75-B3E2-D050FABCF4E1}"/>
 

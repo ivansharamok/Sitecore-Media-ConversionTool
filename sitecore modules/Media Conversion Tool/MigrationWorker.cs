@@ -1,34 +1,31 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-
-using Sitecore.Collections;
-using Sitecore.Data;
-using Sitecore.Data.Items;
-using Sitecore.Diagnostics;
-using Sitecore.Configuration;
-using Sitecore.Resources.Media;
-using Sitecore.Jobs;
-using Sitecore.StringExtensions;
-
 namespace Sitecore.Modules.MediaConversionTool
 {
+   using System;
+   using System.Collections.Generic;
+   using System.Diagnostics;
+
+   using Sitecore.Data;
+   using Sitecore.Data.Items;
+   using Sitecore.Diagnostics;
+   using Sitecore.Configuration;
+   using Sitecore.Jobs;
+   using Sitecore.StringExtensions;
+
    internal class MigrationWorker
    {
-      private readonly ItemReference[] dataToProcess;
-      private readonly bool convertToBlob;
+      private readonly ConversionReference[] _dataToProcess;
+      private readonly ConversionType _conversionType;
 
-      private MigrationWorker(ItemReference[] elements, bool convertToBlob)
+      private MigrationWorker(ConversionReference[] elements, ConversionType conversionType)
       {
          Assert.ArgumentNotNull(elements, "elements");
-         this.dataToProcess = elements;
-         this.convertToBlob = convertToBlob;
+         this._dataToProcess = elements;
+         this._conversionType = conversionType;
       }
 
-      public static Job CreateJob(ItemReference[] elements, bool convertToBlob)
+      public static Job CreateJob(ConversionReference[] elements, ConversionType conversionType)
       {
-         MigrationWorker worker = new MigrationWorker(elements, convertToBlob);
+         MigrationWorker worker = new MigrationWorker(elements, conversionType);
          JobOptions options = new JobOptions("MediaMigration", "MediaMigration", "shell", worker, "ThreadEntry");
          return new Job(options);
       }
@@ -37,7 +34,7 @@ namespace Sitecore.Modules.MediaConversionTool
       {
          try
          {
-            ProcessReferences(this.dataToProcess);
+            ProcessReferences(this._dataToProcess);
          }
          catch (Exception e)
          {
@@ -45,11 +42,11 @@ namespace Sitecore.Modules.MediaConversionTool
          }
       }
 
-      private void ProcessReferences(ItemReference[] itemReferences)
+      private void ProcessReferences(ConversionReference[] conversionReferences)
       {
          Context.Job.Status.Processed = 0;
 
-         foreach (var reference in itemReferences)
+         foreach (var reference in conversionReferences)
          {
             Database database = Factory.GetDatabase(reference.ItemUri.DatabaseName);
             Item item = database.GetItem(reference.ItemUri.ItemID);
@@ -95,31 +92,28 @@ Log.Debug("GetChildEnumerator for item '{0}' took '{1:c}'".FormatWith(new object
 
                Context.Job.Status.Messages.Add(string.Format("Current item is {0}", GetItemPath(item)));
 
-               if (this.convertToBlob)
+               switch (this._conversionType)
                {
+                  case ConversionType.Blob:
 #if DEBUG
 Stopwatch timer = Stopwatch.StartNew();
 #endif
-                  
-                  processedEntities = MediaStorageManager.ChangeToDatabase(item);
-
+                     processedEntities = MediaStorageManager.ChangeToDatabase(item);
 #if DEBUG
-                  timer.Stop();
-                  Log.Debug("ChangeToDatabase for item '{0}' took '{1:c}'".FormatWith(new object[]{ item.Uri.ToString(), timer.Elapsed}), this);
+timer.Stop();
+Log.Debug("ChangeToDatabase for item '{0}' took '{1:c}'".FormatWith(new object[]{ item.Uri.ToString(), timer.Elapsed}), this);
 #endif
-               }
-               else
-               {
+                     break;
+                  case ConversionType.File:
 #if DEBUG
-Stopwatch timer = Stopwatch.StartNew();
+timer = Stopwatch.StartNew();
 #endif
-
-                  processedEntities = MediaStorageManager.ChangeToFileSystem(item);
-
+                     processedEntities = MediaStorageManager.ChangeToFileSystem(item);
 #if DEBUG
                   timer.Stop();
                   Log.Debug("ChangeToFileSystem for item '{0}' took '{1:c}'".FormatWith(new object[] { item.Uri.ToString(), timer.Elapsed }), this);
 #endif
+                     break;
                }
 
                Context.Job.Status.Processed += processedEntities;
@@ -150,21 +144,5 @@ Stopwatch timer = Stopwatch.StartNew();
       }
 
       #endregion Private methods
-
-      #region ItemReference class
-
-      internal class ItemReference
-      {
-         public ItemUri ItemUri;
-         public bool Recursive;
-
-         public ItemReference(ItemUri uri, bool recursive)
-         {
-            this.ItemUri = uri;
-            this.Recursive = recursive;
-         }
-      }
-
-      #endregion   ItemReference class
    }
 }

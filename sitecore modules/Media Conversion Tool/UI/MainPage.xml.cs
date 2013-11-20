@@ -10,7 +10,7 @@ using Sitecore.Web.UI.HtmlControls;
 using Sitecore.Web.UI.Sheer;
 using Sitecore.Shell.Framework;
 
-namespace Sitecore.Modules.MediaConversionTool
+namespace Sitecore.Modules.MediaConversionTool.UI
 {
    using System.Linq;
 
@@ -115,19 +115,22 @@ namespace Sitecore.Modules.MediaConversionTool
             return;
          }
 
-         List<MigrationWorker.ItemReference> itemsToProcess = new List<MigrationWorker.ItemReference>();
+         List<ConversionReference> itemsToProcess = new List<ConversionReference>();
          foreach (ListviewItem item in this.ItemList.Items)
          {
             string[] textArray = item.Value.Split(new char[] { ':' }, 2);
             ItemUri uri = ItemUri.Parse(textArray[1]);
             if (uri != null)
             {
-               itemsToProcess.Add(new MigrationWorker.ItemReference(uri, textArray[0] == "recursive"));
+               itemsToProcess.Add(new ConversionReference(uri, textArray[0] == "recursive"));
             }
          }
 
-         bool convertToBlob = this.TargetGroup.Value.Equals(ConvertToBlob, StringComparison.InvariantCultureIgnoreCase);
-         Job job = MigrationWorker.CreateJob(itemsToProcess.ToArray(), convertToBlob);
+         ConversionType conversionType = this.TargetGroup.Value.Equals(ConvertToBlob, StringComparison.InvariantCultureIgnoreCase) ? ConversionType.Blob : ConversionType.File;
+         //Job job = MigrationWorker.CreateJob(itemsToProcess.ToArray(), conversionType);
+         var options = new ConversionOptions(conversionType, false);
+         Job job = MediaConversionManager.StartConversion(itemsToProcess, options, Context.User);
+         job.Options.CustomData = options;
          JobManager.Start(job);
          string url = "/sitecore/shell/default.aspx?xmlcontrol=MediaConversionToolWorkingForm&handle=" + job.Handle;
          SheerResponse.SetLocation(url);
