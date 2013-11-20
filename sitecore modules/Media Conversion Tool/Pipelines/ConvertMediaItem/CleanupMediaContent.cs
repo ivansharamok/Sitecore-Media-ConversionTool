@@ -28,15 +28,15 @@
       protected virtual void DetermineCleanupOption(ConvertMediaItemContext context)
       {
          var conversionType = context.MediaContext.Options.ConversionType;
-         var keyValue = new KeyValuePair<Item, string>(context.Item, context.CleanupReference);
+         var reference = context.CleanupReference;
          switch (conversionType)
          {
             case ConversionType.Blob:
-               if (Configuration.Settings.DeleteConvertedFiles && !string.IsNullOrEmpty(context.CleanupReference))
+               if (Configuration.Settings.DeleteConvertedFiles && !string.IsNullOrEmpty(reference))
                   ManagedThreadPool.QueueUserWorkItem(this.RemoveFile, context);
                break;
             case ConversionType.File:
-               if (Configuration.Settings.DeleteConvertedBlobs && !string.IsNullOrEmpty(context.CleanupReference))
+               if (Configuration.Settings.DeleteConvertedBlobs && !string.IsNullOrEmpty(reference))
                   ManagedThreadPool.QueueUserWorkItem(this.RemoveBlob, context);
                break;
          }
