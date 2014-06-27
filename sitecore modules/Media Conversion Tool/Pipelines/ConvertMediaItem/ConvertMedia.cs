@@ -39,14 +39,13 @@
          Item item = context.Item;
          MediaItem mediaItem = item;
          var blobField = item.Fields[Settings.BlobFieldName];
-         string abortMessage;
-         // blobField.GetBlobStream() bypasses any caches thus it could have negative performance impact. Though it guarantees latest data from the database.
+          // blobField.GetBlobStream() bypasses any caches thus it could have negative performance impact. Though it guarantees latest data from the database.
          // mediaItem.GetMediaStream() does not return valid data when there is a version with a file based media.
          Stream memoryStream = blobField.GetBlobStream();
          if (memoryStream == null)
          {
-            abortMessage = "Item {0} - {1} does not have any media content.".FormatWith(item.Name, item.Uri.ToString());
-            context.AbortPipeline(ConversionAction.Failed, abortMessage);
+             string abortMessage = "Item {0} - {1} does not have any media content.".FormatWith(item.Name, item.Uri.ToString());
+             context.AbortPipeline(ConversionAction.Failed, abortMessage);
          }
 
          string filePath = GetFilePath(mediaItem);
@@ -62,7 +61,7 @@
          }
          catch (Exception exception)
          {
-            var message = "Failed to convert blob into file for item: {0} - {1}".FormatWith(item.ID, item.Uri.ToString());
+            var message = "Failed to convert blob into file for item: {0} - {1}. Exception: {2}".FormatWith(item.ID, item.Uri.ToString(), exception.ToString());
             context.AbortPipeline(ConversionAction.Failed, message);
          }
          context.Result = new ConvertMediaItemResult(ConversionAction.Processed, "Media storage for item: {0} - {1} has been changed to file system: {2}".FormatWith(item.Name, item.Uri.ToString(), FileUtil.UnmapPath(filePath, false)));

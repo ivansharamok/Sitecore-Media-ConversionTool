@@ -1,9 +1,7 @@
 ﻿namespace Sitecore.Modules.MediaConversionTool.Pipelines.ConvertMediaItem
 {
    using System;
-   using System.Collections.Generic;
    using Sitecore.Configuration;
-   using Sitecore.Data;
    using Sitecore.Data.DataProviders.Sql;
    using Sitecore.Data.Items;
    using Sitecore.Data.SqlServer;
@@ -91,11 +89,12 @@
       {
          Assert.ArgumentNotNull(sqlDataApi, "sqlDataApi");
          Assert.ArgumentNotNullOrEmpty(reference, "reference");
-         string[] sqlTables = {"SharedFields", "UnversionedFields", "VersionedFields", "ArchivedFields"};
-         string sql = "DELETE FROM {0}tableName{1} WHERE {0}Value{1} LIKE {2}blobId{3}";
+         // These lines related to commented block in try-catch block.
+         //string[] sqlTables = {"SharedFields", "UnversionedFields", "VersionedFields", "ArchivedFields"};
+         //string sql = "DELETE FROM {0}tableName{1} WHERE {0}Value{1} LIKE {2}blobId{3}";
          try
          {
-            //// Transaction may cause deadlocks on large data sets. It's likely to happen for VersionedFields as there is a lot of entries in there.
+            //// Transaction may cause deadlocks on large data sets. It's likely to happen for VersionedFields as there might be a lot of entries in there.
             ////using (DataProviderTransaction transaction = sqlDataApi.CreateTransaction())
             ////{
             //foreach (string table in sqlTables)
